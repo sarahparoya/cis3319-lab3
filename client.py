@@ -1,5 +1,4 @@
 import socket
-import hmac
 from des import DesKey
 
 
@@ -7,24 +6,34 @@ def client_program():
     host = socket.gethostname()
     port = 12345  # socket server port number
 
-
     # create the socket in the client side
-    c = socket.socket()
-    c.connect((host, port))  # connect to the server
+    s = socket.socket()
+    s.connect((host, port))  # connect to the server
+    desFile = open("deskey.txt", "r")
+    hmacFile = open("hmackey.txt", "r")
 
-    # print("Hi server, this is client.")
-
-    message = input(" -> ")  # take input
+    desKeystr = desFile.read()
+    key = DesKey(desKeystr.encode('utf-8'))  # create a key
+    message = input(" -> ")
 
     while message.lower().strip() != 'bye':
-        c.send(message.encode())  # send message
-        data = c.recv(1024).decode()  # receive response
+        ct = key.encrypt(message.encode('utf-8'), padding=True)
+        print("shared DES key: %s"%desKeystr)
+        print("sent plaintext: %s" % message)
+        print("sent ciphertext: %s" % ct.decode('utf-8', 'ignore'))
+        print("===========================================================")
+        s.send(ct)
 
-        print('Received from server: ' + data)  # show in terminal
+        data = s.recv(1024)  # receive response
+        print("received ciphertext: %s" % data.decode('utf-8', 'ignore'))
+        pt = key.decrypt(data, padding=True).decode()
+        print("received plaintext: %s" % pt)
+        print("===========================================================")
 
         message = input(" -> ")  # again take input
-
-    c.close()  # close the connection
+    s.close()  # close the connection
+    desFile.close()
+    hmacFile.close()
 
 
 if __name__ == '__main__':
