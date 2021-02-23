@@ -1,10 +1,10 @@
 # CIS 3319 Lab 3
 
 ## Languages and Libraries
-- I used Python as my language
-- I utilized the socket, DES, and HMAC libraries 
+- I used Python as my language.
+- I utilized the socket, DES, and HMAC, and hashlib libraries.
 ## IDE
-- I used PyCharm as my chosen IDE to code, debug, and run my code
+- I used PyCharm as my chosen IDE to code, debug, and run my code. 
 ## How to Run [See Video]
 - To run, you need to have PyCharm, or at least that's how I
 chose to run my application.

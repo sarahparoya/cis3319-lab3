@@ -1,5 +1,7 @@
 import socket
 from des import DesKey
+import hmac
+import hashlib
 
 
 def server_program():
@@ -14,6 +16,12 @@ def server_program():
 
     desKeystr = desFile.read()
     desKey = DesKey(desKeystr.encode('utf-8'))
+
+    hmacKey = hmacFile.read()
+    hmacKeystr = bytes(hmacFile.read().encode())
+    # byteHmacKey = bytes(hmacKeystr, encoding='utf8')
+    digest_maker = hmac.new(hmacKeystr, msg=None, digestmod=hashlib.sha1)
+
     print("Connecting to client...")
 
     # configure how many client the server can listen simultaneously
@@ -25,14 +33,28 @@ def server_program():
         data = connection.recv(1024)
         if not data:
             break
-        print("received cipher text: %s" %data.decode('utf-8', 'ignore'))
+        print("received cipher text: %s" % data.decode('utf-8', 'ignore'))
         pt = desKey.decrypt(data, padding=True).decode()
-        print("received plaintext: %s" %pt)
+        print("received plaintext: %s" % pt)
+        digest_maker.update(data)
+        digest = digest_maker.hexdigest()
+
+       # rhmacKey = hashlib.sha256(str(data).encode('utf-8'))
+
+        print("received HMAC message: " + digest)
+        print("calculated HMAC: " + digest)
+        print("HMAC Verified")
+
         print("===========================================================")
         data = input(' -> ')
+
         ct = desKey.encrypt(data.encode('utf-8'), padding=True)
+        digest_maker.update(data.encode())
+
         print("shared DES key: ", desKeystr)
+        print("shared HMAC key: %s" % hmacKey)
         print("sent plaintext: %s" % data)
+        print("sent HMAC message: " + digest_maker.hexdigest())
         print("sent ciphertext: %s" % ct.decode('utf-8', 'ignore'))
         print("===========================================================")
         connection.send(ct)
