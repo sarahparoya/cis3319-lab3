@@ -18,9 +18,9 @@ def client_program():
     key = DesKey(desKeystr.encode('utf-8'))  # create a key
 
     hmacKey = hmacFile.read()
-    hmacKeystr = bytes(hmacFile.read().encode())
-
-    digest_maker = hmac.new(hmacKeystr, msg=None, digestmod=hashlib.sha1)
+    hmacKeystr = hmacFile.read()
+    byteHmacKey = bytes(hmacKeystr, encoding='utf8')
+    digest_maker = hmac.new(byteHmacKey, msg=None, digestmod=hashlib.sha1)
 
     message = input(" -> ")
 
